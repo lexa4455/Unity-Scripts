@@ -1,0 +1,19 @@
+using UnityEngine;
+using UnityEditor.SceneManagement; // библиотека для работы со сценами
+
+public class SceneChange : MonoBehaviour
+{
+    // Имя сцены, которую нужно перезапустить
+    public string sceneName;
+
+    // Метод, который вызывается при входе игрока в зону триггера
+    private void OnTriggerEnter(Collider other)
+    {
+        // Проверяем, что в триггер вошёл игрок
+        if (other.CompareTag("Player"))
+        {
+            // Перезапуск сцены
+            EditorSceneManager.LoadScene(sceneName);
+        }
+    }
+}
