@@ -1,0 +1,62 @@
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.UI;
+
+public class AudioSettingsUI : MonoBehaviour
+{
+    [Header("Mixer & Params")]
+    public AudioMixer mixer;
+    public string masterParam = "MasterVol";
+    public string musicParam  = "MusicVol";
+    public string sfxParam    = "SfxVol";
+    public string voiceParam  = "VoiceVol";
+
+    [Header("UI")]
+    public Slider master;
+    public Slider music;
+    public Slider sfx;
+    public Slider voice;
+    public Toggle mute;
+
+    private void Start()
+    {
+        master.value = SettingsService.Data.master;
+        music.value  = SettingsService.Data.music;
+        sfx.value    = SettingsService.Data.sfx;
+        voice.value  = SettingsService.Data.voice;
+        mute.isOn    = SettingsService.Data.mute;
+        ApplyAll();
+
+        master.onValueChanged.AddListener(_ => OnChanged());
+        music.onValueChanged.AddListener(_ => OnChanged());
+        sfx.onValueChanged.AddListener(_ => OnChanged());
+        voice.onValueChanged.AddListener(_ => OnChanged());
+        mute.onValueChanged.AddListener(_ => OnChanged());
+    }
+
+    private void OnChanged()
+    {
+        SettingsService.Data.master = master.value;
+        SettingsService.Data.music  = music.value;
+        SettingsService.Data.sfx    = sfx.value;
+        SettingsService.Data.voice  = voice.value;
+        SettingsService.Data.mute   = mute.isOn;
+        ApplyAll();
+        SettingsService.Save();
+    }
+
+    private void ApplyAll()
+    {
+        SetVol(masterParam, SettingsService.Data.mute ? 0f : SettingsService.Data.master);
+        SetVol(musicParam,  SettingsService.Data.mute ? 0f : SettingsService.Data.music);
+        SetVol(sfxParam,    SettingsService.Data.mute ? 0f : SettingsService.Data.sfx);
+        SetVol(voiceParam,  SettingsService.Data.mute ? 0f : SettingsService.Data.voice);
+    }
+
+    private void SetVol(string param, float linear)
+    {
+        float v = Mathf.Clamp(linear, 0.0001f, 1f);
+        float db = Mathf.Log10(v) * 20f;
+        mixer.SetFloat(param, db);
+    }
+}
